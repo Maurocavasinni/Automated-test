@@ -103,7 +103,7 @@ public class TokenJWTService {
     public TokenJWTDto generateToken (String userId, String username, String role) throws TokenException {
         Map<String, Object> claims = new HashMap<>();
 
-        if (userId.equals(null) || username.equals(null) || role.equals(null)) {
+        if (userId == null || username == null || role == null) {
             throw new TokenException("Token cannot have null fields.");
         }
         
