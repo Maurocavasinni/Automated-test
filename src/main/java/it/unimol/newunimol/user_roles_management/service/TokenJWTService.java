@@ -15,6 +15,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import it.unimol.newunimol.user_roles_management.dto.TokenJWTDto;
+import it.unimol.newunimol.user_roles_management.exceptions.TokenException;
 
 @Service
 public class TokenJWTService {
@@ -99,8 +100,12 @@ public class TokenJWTService {
         return !isTokenExpired(token);
     }
 
-    public TokenJWTDto generateToken (String userId, String username, String role) {
+    public TokenJWTDto generateToken (String userId, String username, String role) throws TokenException {
         Map<String, Object> claims = new HashMap<>();
+
+        if (userId.equals(null) || username.equals(null) || role.equals(null)) {
+            throw new TokenException("Token cannot have null fields.");
+        }
         
         long now = System.currentTimeMillis();
         long expiration = now + (this.jwtExpiration * 1000);
@@ -122,7 +127,7 @@ public class TokenJWTService {
         return new TokenJWTDto(token);
     }
 
-    public TokenJWTDto refreshToken(String token) throws RuntimeException {
+    public TokenJWTDto refreshToken(String token) throws RuntimeException, TokenException {
         Claims claims = extractAllClaims(token);
         String userId = claims.getSubject();
         String username = claims.get("username", String.class);

@@ -80,4 +80,118 @@ class UserServiceTest {
         assertEquals("000002", profile.id());
         assertEquals("m.pesce", profile.username());
     }
+
+    @Test
+    void testFindByUserIdNotFound() {
+        assertThrows(UnknownUserException.class, () -> {
+            userService.findByUserId("999999");
+        });
+    }
+
+    @Test
+    void testFindByUsernameNotFound() {
+        assertThrows(UnknownUserException.class, () -> {
+            userService.findByUsername("nonexistent");
+        });
+    }
+
+    @Test
+    void testUpdateUserNotFound() {
+        UserDto userData = new UserDto("999999", "username", "email@test.com",
+                "Name", "Surname", "password", null, null, null);
+        
+        assertThrows(UnknownUserException.class, () -> {
+            userService.updateUser("999999", userData);
+        });
+    }
+
+    @Test
+    void testGetUserProfileInvalidToken() {
+        assertThrows(UnknownUserException.class, () -> {
+            userService.getUserProfile("invalid-token");
+        });
+    }
+
+    @Test
+    void testCreateSuperAdminWithInvalidData() {
+        UserCreationDto request = new UserCreationDto("", "", "", "", "", "");
+        
+        assertThrows(InvalidRequestException.class, () -> {
+            userService.createSuperAdminIfNotExists(request);
+        });
+    }
+
+    @Test
+    void testCreateSuperAdminWithNullFields() {
+        UserCreationDto request = new UserCreationDto(null, null, null, null, null, null);
+        
+        assertThrows(InvalidRequestException.class, () -> {
+            userService.createSuperAdminIfNotExists(request);
+        });
+    }
+
+    @Test
+    void testGetAllUsersReturnsNonEmptyList() {
+        List<UserProfileDto> users = userService.getAllUsers();
+        
+        assertNotNull(users);
+        assertFalse(users.isEmpty());
+        assertTrue(users.size() >= 1);
+    }
+
+    @Test
+    void testUpdateUserWithPartialData() throws UnknownUserException {
+        UserDto userData = new UserDto("000001", "partialuser", null,
+                null, null, null, null, null, null);
+        
+        UserDto updated = userService.updateUser("000001", userData);
+        
+        assertNotNull(updated);
+        assertEquals("000001", updated.id());
+    }
+
+    @Test
+    void testFindByUserIdWithValidId() throws UnknownUserException {
+        UserDto user = userService.findByUserId("000001");
+        
+        assertNotNull(user);
+        assertNotNull(user.username());
+        assertNotNull(user.email());
+    }
+
+    @Test
+    void testGetUserProfileWithValidToken() throws UnknownUserException {
+        UserProfileDto profile = userService.getUserProfile("token");
+        
+        assertNotNull(profile);
+        assertNotNull(profile.username());
+        assertNotNull(profile.email());
+    }
+
+    @Test
+    void testCreateSuperAdminWithNullUsername() {
+        UserCreationDto request = new UserCreationDto(null, "email@test.com", "Name", "Surname", "password", "sadmin");
+        
+        assertThrows(InvalidRequestException.class, () -> {
+            userService.createSuperAdminIfNotExists(request);
+        });
+    }
+
+    @Test
+    void testCreateSuperAdminWithEmptyEmail() {
+        UserCreationDto request = new UserCreationDto("username", "", "Name", "Surname", "password", "sadmin");
+        
+        assertThrows(InvalidRequestException.class, () -> {
+            userService.createSuperAdminIfNotExists(request);
+        });
+    }
+
+    @Test
+    void testCreateSuperAdminWithNullPassword() {
+        UserCreationDto request = new UserCreationDto("username", "email@test.com", "Name", "Surname", null, "sadmin");
+        
+        assertThrows(InvalidRequestException.class, () -> {
+            userService.createSuperAdminIfNotExists(request);
+        });
+    }
 }

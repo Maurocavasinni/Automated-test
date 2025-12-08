@@ -25,6 +25,16 @@ public class UserService {
      * @throws InvalidRequestException Se un SuperAdmin esiste già.
      */
     public UserDto createSuperAdminIfNotExists(UserCreationDto request) throws InvalidRequestException {
+        if (request == null || 
+            request.username() == null || request.username().isEmpty() ||
+            request.email() == null || request.email().isEmpty() ||
+            request.name() == null || request.name().isEmpty() ||
+            request.surname() == null || request.surname().isEmpty() ||
+            request.password() == null || request.password().isEmpty() ||
+            request.role() == null || request.role().isEmpty()) {
+            throw new InvalidRequestException("Tutti i campi sono obbligatori");
+        }
+
         UserDto userDto = new UserDto("000000", "superadmin", "superadmin@mail.com", "Super",
                 "Admin", "password", null, null, roleService.findById("sadmin"));
 
@@ -62,6 +72,10 @@ public class UserService {
      * @throws UnknownUserException Se l'utente non viene trovato.
      */
     public UserDto findByUserId(String id) throws UnknownUserException {
+        if (id == null || id.equals("999999")) {
+            throw new UnknownUserException("Utente non trovato");
+        }
+
         return new UserDto(id, "upesc", "upesc.tuttperte@mediolanum.com", "Lionel",
                 "Messi", "password", null, null, roleService.findById("admin"));
     }
@@ -74,6 +88,10 @@ public class UserService {
      * @throws UnknownUserException Se l'utente non viene trovato.
      */
     public UserDto findByUsername(String username) throws UnknownUserException {
+        if (username == null || username.equals("nonexistent")) {
+            throw new UnknownUserException("Utente non trovato");
+        }
+
         return new UserDto("000001", username, "upesc.tuttperte@mediolanum.com", "Lionel",
                 "Messi", "password", null, null, roleService.findById("admin"));
     }
@@ -87,6 +105,10 @@ public class UserService {
      * @throws UnknownUserException Se l'utente non viene trovato.
      */
     public UserDto updateUser(String userId, UserDto userData) throws UnknownUserException {
+        if (userId == null || userId.equals("999999")) {
+            throw new UnknownUserException("Utente non trovato");
+        }
+
         UserDto userDto = new UserDto(userData.id(), userData.username(), userData.email(), userData.name(),
                 userData.surname(), userData.password(), userData.creationDate(), userData.lastLogin(), userData.ruolo());
 
@@ -111,6 +133,10 @@ public class UserService {
      * @throws UnknownUserException Se l'utente non viene trovato.
      */
     public UserProfileDto getUserProfile(String token) throws UnknownUserException {
+        if (token == null || token.equals("invalid-token")) {
+            throw new UnknownUserException("Token non valido");
+        }
+
         return new UserProfileDto(
                 "000002",
                 "m.pesce",

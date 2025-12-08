@@ -38,6 +38,9 @@ public class RoleService {
      * @return Un RoleDto se il ruolo esiste, altrimenti null.
      */
     public RoleDto findById(String roleId) {
+        if (roleId == null || roleId.isEmpty()) {
+            return null;
+        }
         return ROLES.get(roleId);
     }
 
