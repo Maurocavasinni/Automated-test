@@ -132,7 +132,6 @@
 						<exclude>**/dto/**/*.class</exclude>
 						<exclude>**/exceptions/**/*.class</exclude>
 						<exclude>**/util/**/*.class</exclude>
-						<exclude>**/NewunimolApplication.class</exclude>
 					</excludes>
 				</configuration>
 				<executions>
