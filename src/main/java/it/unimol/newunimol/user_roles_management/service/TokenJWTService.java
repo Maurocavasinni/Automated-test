@@ -6,7 +6,6 @@ import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -30,8 +29,6 @@ public class TokenJWTService {
 
     private PrivateKey privateKey;
     private PublicKey publicKey;
-
-    private static final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
 
     private PrivateKey getPrivateKey() {
         if (this.privateKey == null) {
@@ -99,7 +96,7 @@ public class TokenJWTService {
     }
 
     public boolean isTokenValid (String token) {
-        return !isTokenExpired(token) && !invalidatedTokens.contains(token);
+        return !isTokenExpired(token);
     }
 
     public TokenJWTDto generateToken (String userId, String username, String role) {
@@ -125,21 +122,11 @@ public class TokenJWTService {
         return new TokenJWTDto(token);
     }
 
-    public void invalidateToken(String token) {
-        invalidatedTokens.add(token);
-    }
-
     public TokenJWTDto refreshToken(String token) throws RuntimeException {
-        if (invalidatedTokens.contains(token)) {
-            throw new RuntimeException("Token già invalidato, non è possibile effettuare il refresh");
-        }
-
         Claims claims = extractAllClaims(token);
         String userId = claims.getSubject();
         String username = claims.get("username", String.class);
         String role = claims.get("role", String.class);
-
-        invalidateToken(token);
 
         return generateToken(userId, username, role);
     }

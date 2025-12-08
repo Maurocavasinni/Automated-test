@@ -48,7 +48,6 @@ public class AuthService {
      * @param token Il token JWT da invalidare.
      */
     public void logout(String token) {
-        tokenService.invalidateToken(token);
     }
 
     /**
